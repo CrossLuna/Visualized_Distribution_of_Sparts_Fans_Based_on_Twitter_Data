@@ -1,0 +1,150 @@
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+<script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+
+<!-- this goes in the <head> -->
+    <style>
+        #map {
+            height: 600px;
+        }
+        </style>
+        <!-- this goes in the <body> -->
+        <div id="map"></div>
+        <div id="simpleDiv"></div>
+
+<script>
+    // Load the tile images from OpenStreetMap
+
+
+var mytiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+});
+// Initialise an empty map
+//var map = L.map('map');
+var mymap = L.map('map');
+
+
+
+// Read the GeoJSON data with jQuery, and create a circleMarker element for each tweet
+// Each tweet will be represented by a nice red dot
+//var marker = L.marker([51.5, -0.09]).addTo(mymap);
+/*
+$("document").ready(function() {
+        
+    $.get('visual_out.txt', function(data) {
+                    
+                    // The result (data) now passed back is a whole trunk of data
+                    // alert(data);    
+
+                    // Split the whole database trunk into individual lines or records
+                    // The record delimiter is carriage return. Therefore split it.
+                    var lines = data.split("\n");
+            
+                    // Loop through all lines of record
+                    $.each(lines, function(n, urlRecord) {
+                         //$('.simpleDiv').append('<div>' + urlRecord + '</div>');    
+                         alert(urlRecord);
+                    });
+            });
+            
+});
+*/
+
+/*
+$.getJSON("./geo_data.json", function(data) {
+    var myStyle = {
+        radius: 2,
+        fillColor: "blue",
+        color: "blue",
+        weight: 5,
+        opacity: 1,
+        fillOpacity: 1
+    };
+ 
+    var geojson = L.geoJson(data, {
+        pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, myStyle);
+            //return L.marker(latlng);
+        }
+    });
+    geojson.addTo(map)
+});
+*/
+
+function readTextFile(file)
+{
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+                //alert(allText);
+                //var lines = allText.split('\n');
+                var lines = allText.split('*&*&*&\n');
+                var colors = ["#EE4266", "#FFD23F", "#2FBF71", "#3BCEAC", "#540D6E"];
+                for (i = 0; i<lines.length; ++i) {
+                    //alert(lines[i]);
+                    var words = lines[i].split(' *-+!2312$ ');
+                    var tweet_text = words[1];
+                    //words = lines[i].split(' ');
+                    words = words[0].split(' ');
+                    /*
+                    for (j = 0; j<words.length; ++j) {
+                        //alert(words[j])
+                    }
+                    */
+                    var idx = words[0];
+                    var lon = parseFloat(words[1]);
+                    var lat = parseFloat(words[2]);
+                    var label = parseInt(words[3]);
+                    //var marker = L.marker([lat, lon]).addTo(mymap);
+                    var myStyle = {
+                        radius: 8,
+                        //fillColor: "blue",
+                        //color: "blue",
+                        fillColor: "#540D6E",
+                        color: "#001811",
+                        //weight: 5,
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 1
+                    };
+                    //myStyle['color'] = 'red';
+                    
+                    //alert(lable);
+                    //myStyle['color'] = colors[label];
+                    myStyle['fillColor'] = colors[label];
+                    //myStyle['fillcolor'] = colors[label];
+
+                    var marker = L.circleMarker([lat, lon], myStyle).addTo(mymap)
+                    //.bindPopup(idx);
+                    .bindPopup(tweet_text);
+                    /*
+                    alert(idx);
+                    alert(lon);
+                    alert(lat);
+                    alert(lable);
+                    */
+                }
+                
+                
+            }
+        }
+    }
+    rawFile.send(null);
+}
+//readTextFile("visual_out.txt");
+//readTextFile("../twitter_scraper/visual_out_test.txt")
+//readTextFile("visual_out_test.txt")
+//readTextFile("visual_out_2.txt")
+readTextFile("visual_out_big.txt")
+
+// Add the tiles to the map, and initialise the view in the middle of Europe
+//map.addLayer(mytiles).setView([50.5, 5.0], 5);
+mymap.addLayer(mytiles).setView([40.75, -74], 12);
+</script>
